@@ -1,0 +1,117 @@
+{% extends "theme/base.html" %}
+
+{% block content %}
+<div class="container-xl">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header d-print-none">
+    <div class="row align-items-center">
+      <div class="col">
+        <div class="page-pretitle">Settings</div>
+        <h2 class="page-title">Account Management</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- MESSAGES -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show" role="alert">
+        <div class="d-flex">
+          <div><i class="fas fa-circle-check me-2"></i>{{ message }}</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="row row-deck row-cards">
+
+    <!-- ============ PROFILE ============ -->
+    <div class="col-lg-7">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-id-card me-2"></i>Profile</div>
+        </div>
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="section" value="profile">
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" value="{{ request.user.username }}" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email (login ID)</label>
+                <input type="email" name="email" class="form-control" value="{{ request.user.email }}" required>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">First Name</label>
+                <input type="text" name="first_name" class="form-control" value="{{ request.user.first_name }}">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Middle Name</label>
+                <input type="text" name="middle_name" class="form-control" value="{{ request.user.middle_name }}">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="last_name" class="form-control" value="{{ request.user.last_name }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Birthday</label>
+                <input type="date" name="birthday" class="form-control" value="{{ request.user.birthday|date:'Y-m-d' }}">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Member since</label>
+                <input type="text" class="form-control" value="{{ request.user.created_at|date:'M j, Y' }}" disabled>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save me-1"></i> Save Profile
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ============ PASSWORD ============ -->
+    <div class="col-lg-5">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-lock me-2"></i>Change Password</div>
+        </div>
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="section" value="password">
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Current Password</label>
+                <input type="password" name="current_password" class="form-control" autocomplete="current-password" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label">New Password</label>
+                <input type="password" name="new_password" class="form-control" autocomplete="new-password" minlength="8" required>
+                <small class="form-hint">Minimum 8 characters</small>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Confirm New Password</label>
+                <input type="password" name="confirm_password" class="form-control" autocomplete="new-password" minlength="8" required>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer d-flex justify-content-end">
+            <button type="submit" class="btn btn-danger">
+              <i class="fas fa-key me-1"></i> Change Password
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

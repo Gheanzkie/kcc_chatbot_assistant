@@ -4,6 +4,8 @@ from . import views
 app_name = 'users'
 
 urlpatterns = [
+    # Profile / password (sidebar popup)
+    path('profile/', views.profile_edit, name='profile'),
     # Page
     path('', views.user_list_page, name='user_list'),
     # AJAX

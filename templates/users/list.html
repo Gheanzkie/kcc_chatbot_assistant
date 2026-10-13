@@ -44,7 +44,7 @@
 <!-- SEARCH BAR -->
 <form method="GET" class="mb-3">
     <div class="input-group" style="max-width: 400px;">
-        <span class="input-group-text"><i class="ti ti-search"></i></span>
+        <span class="input-group-text"><i class="fas fa-search"></i></span>
         <input type="text"
                name="q"
                value="{{ query }}"
@@ -138,8 +138,8 @@
                                    data-email="{{ u.email }}"
                                    data-active="{{ u.is_active|yesno:'true,false' }}"
                                    data-staff="{{ u.is_staff|yesno:'true,false' }}"
-                                   title="Edit">
-                                    <i class="ti ti-pencil text-primary"></i>
+                                    title="Edit">
+                                    <i class="fas fa-pencil text-primary"></i>
                                 </a>
                                 <a href="#"
                                    class="btn btn-ghost-secondary btn-icon btn-sm"
@@ -147,8 +147,8 @@
                                    data-bs-target="#deleteUserModal"
                                    data-id="{{ u.id }}"
                                    data-name="{{ u.username }}"
-                                   title="Delete">
-                                    <i class="ti ti-trash text-danger"></i>
+                                    title="Delete">
+                                    <i class="fas fa-trash text-danger"></i>
                                 </a>
                             </div>
                         </td>
@@ -182,7 +182,7 @@
                 {% if users.has_previous %}
                 <li class="page-item">
                     <a class="page-link" href="?page={{ users.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">
-                        <i class="ti ti-chevron-left"></i> prev
+                        <i class="fas fa-chevron-left"></i> prev
                     </a>
                 </li>
                 {% endif %}
@@ -194,7 +194,7 @@
                 {% if users.has_next %}
                 <li class="page-item">
                     <a class="page-link" href="?page={{ users.next_page_number }}{% if query %}&q={{ query }}{% endif %}">
-                        next <i class="ti ti-chevron-right"></i>
+                        next <i class="fas fa-chevron-right"></i>
                     </a>
                 </li>
                 {% endif %}

@@ -1,26 +1,12 @@
+{% load static %}
 <aside class="navbar navbar-vertical navbar-expand-lg navbar-dark dh-sidebar">
   <div class="container-fluid">
-    <div class="navbar-brand navbar-brand-autodark dh-brand">
-      <a href="." class="d-flex align-items-center gap-2 text-decoration-none">
-        <span class="dh-brand-mark">
-          <i class="fa-solid fa-shield-halved"></i>
-        </span>
-        <span class="lh-1">
-          <span class="dh-brand-name">Project<span class="text-warning">V3</span></span>
-          <span class="dh-brand-sub">Management System</span>
-        </span>
-      </a>
-    </div>
+    <a href="{% url 'dashboard' %}" class="navbar-brand navbar-brand-autodark d-flex align-items-center gap-2 text-decoration-none" style="padding: 0.75rem 0.5rem;">
+      <img src="{% static 'img/kcc_logo.png' %}" alt="KCC" style="width:36px;height:36px;object-fit:contain;border-radius:8px;">
+      <span class="dh-brand-name"><span style="color:var(--kcc-accent)">KCC</span> CHATBOT</span>
+    </a>
 
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#sidebar-menu"
-      aria-controls="sidebar-menu"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-      >
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu" aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
@@ -28,68 +14,247 @@
       <ul class="navbar-nav pt-lg-2 py-lg-2">
 
         <li class="nav-item">
-          <span class="dh-nav-section">
-            Menu
-          </span>
+          <span class="dh-nav-section">Menu</span>
         </li>
+
         <li class="nav-item mb-1">
           <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">
-            <span class="nav-link-icon d-md-none d-lg-inline-block">
-              <i class="fa fa-dashboard"></i>
-            </span>
+            <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="fa fa-dashboard"></i></span>
             <span class="nav-link-title">Dashboard</span>
           </a>
         </li>
 
+        {% if user.is_superuser %}
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.app_name == 'users' %}active{% endif %}" href="{% url 'users:user_list' %}">
-            <span class="nav-link-icon d-md-none d-lg-inline-block">
-              <i class="nav-icon fas fa-users"></i>
-            </span>
+            <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="fas fa-users"></i></span>
             <span class="nav-link-title">Users</span>
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.app_name == 'info' %}active{% endif %}" href="{% url 'info:info_list' %}">
-            <span class="nav-link-icon d-md-none d-lg-inline-block">
-              <i class="nav-icon fas fa-address-card"></i>
-            </span>
-            <span class="nav-link-title">Info</span>
-          </a>
-        </li>
-
-        {% if user.is_authenticated %}
-        <li class="nav-item d-lg-none">
-          <a class="nav-link" href="{% url 'logout' %}">
-            <span class="nav-link-icon d-md-none d-lg-inline-block">
-              <i class="nav-icon fas fa-sign-out-alt"></i>
-            </span>
-            <span class="nav-link-title">Logout</span>
           </a>
         </li>
         {% endif %}
 
+        <li class="nav-item d-lg-none">
+          <a class="nav-link" href="{% url 'logout' %}">
+            <span class="nav-link-icon d-md-none d-lg-inline-block"><i class="fas fa-sign-out-alt"></i></span>
+            <span class="nav-link-title">Logout</span>
+          </a>
+        </li>
+
+        {% if user.is_authenticated %}
         <li class="nav-item mt-auto dh-nav-sidebar-footer">
           <div class="dh-user-card">
-            <a href="{% url 'users:user_list' %}" class="d-flex align-items-center gap-2 text-decoration-none text-white min-w-0 w-100">
+            <a href="#" class="d-flex align-items-center gap-2 text-decoration-none text-white min-w-0 w-100"
+               data-bs-toggle="modal" data-bs-target="#editProfileModal" title="Edit Info">
               <span class="dh-avatar">{{ user.username|first|upper }}</span>
               <span class="min-w-0 flex-grow-1">
                 <span class="dh-user-name">{{ user.username }}</span>
                 <span class="dh-user-role">
-                  {% if user.is_superuser %}Administrator{% elif user.is_authenticated %}Instructor{% endif %}
+                  {% if user.is_superuser %}Super Admin{% else %}Instructor{% endif %}
                 </span>
               </span>
             </a>
-            {% if user.is_authenticated %}
             <a href="{% url 'logout' %}" class="dh-user-logout" title="Logout">
               <i class="fas fa-sign-out-alt"></i>
             </a>
-            {% endif %}
           </div>
         </li>
+        {% endif %}
 
       </ul>
     </div>
   </div>
 </aside>
+
+{% if user.is_authenticated %}
+<!-- ============ EDIT ACCOUNT MODAL (popup) ============ -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editProfileModalLabel">
+          <i class="fas fa-user-pen me-2"></i>My Account
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <ul class="nav nav-tabs mb-3" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tabProfile" type="button" role="tab">
+              <i class="fas fa-id-card me-1"></i> Profile
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tabPassword" type="button" role="tab">
+              <i class="fas fa-lock me-1"></i> Password
+            </button>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+
+          <div class="tab-pane fade show active" id="tabProfile" role="tabpanel">
+            <form id="editProfileForm" method="POST" action="{% url 'users:profile' %}">
+              {% csrf_token %}
+              <input type="hidden" name="section" value="profile">
+
+              <div id="editProfileError" class="alert alert-danger d-none" role="alert"></div>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Username</label>
+                  <input type="text" name="username" class="form-control" value="{{ user.username }}" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Email (login ID)</label>
+                  <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">First Name</label>
+                  <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Middle Name</label>
+                  <input type="text" name="middle_name" class="form-control" value="{{ user.middle_name }}">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Last Name</label>
+                  <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Birthday</label>
+                  <input type="date" name="birthday" class="form-control" value="{{ user.birthday|date:'Y-m-d' }}">
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-end mt-3">
+                <button type="submit" class="btn btn-primary" id="editProfileSubmit">
+                  <i class="fas fa-save me-1"></i> Save Profile
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="tab-pane fade" id="tabPassword" role="tabpanel">
+            <form id="editPasswordForm" method="POST" action="{% url 'users:profile' %}">
+              {% csrf_token %}
+              <input type="hidden" name="section" value="password">
+
+              <div id="editPasswordError" class="alert alert-danger d-none" role="alert"></div>
+
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label">Current Password</label>
+                  <input type="password" name="current_password" class="form-control" autocomplete="current-password" required>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">New Password</label>
+                  <input type="password" name="new_password" class="form-control" autocomplete="new-password" minlength="8" required>
+                  <small class="form-hint">Minimum 8 characters</small>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Confirm New Password</label>
+                  <input type="password" name="confirm_password" class="form-control" autocomplete="new-password" minlength="8" required>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-end mt-3">
+                <button type="submit" class="btn btn-danger" id="editPasswordSubmit">
+                  <i class="fas fa-key me-1"></i> Change Password
+                </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  function getCookie(name) {
+    var value = '; ' + document.cookie;
+    var parts = value.split('; ' + name + '=');
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return '';
+  }
+
+  function showToast(message, type) {
+    var toastEl = document.createElement('div');
+    toastEl.className = 'alert alert-' + (type || 'success') + ' alert-dismissible fade show position-fixed bottom-0 end-0 m-3';
+    toastEl.setAttribute('role', 'alert');
+    toastEl.innerHTML = '<i class="fas fa-' + (type === 'danger' ? 'circle-x' : 'circle-check') + ' me-2"></i>' + message +
+      '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
+    document.body.appendChild(toastEl);
+    setTimeout(function () { toastEl.remove(); }, 4000);
+  }
+
+  function closeModal() {
+    var modalEl = document.getElementById('editProfileModal');
+    var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.hide();
+    // force cleanup leftover backdrop / body locks
+    setTimeout(function () {
+      document.querySelectorAll('.modal-backdrop').forEach(function (b) { b.remove(); });
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('overflow');
+      document.body.style.removeProperty('padding-right');
+    }, 300);
+  }
+
+  function wireAjaxForm(formId, errId, btnId, onSuccess) {
+    var form = document.getElementById(formId);
+    if (!form) return;
+    var errBox = document.getElementById(errId);
+    var btn = document.getElementById(btnId);
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      errBox.classList.add('d-none');
+      btn.disabled = true;
+
+      fetch(form.action, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: new FormData(form)
+      })
+        .then(function (res) { return res.json().then(function (data) { return { ok: res.ok, data: data }; }); })
+        .then(function (r) {
+          btn.disabled = false;
+          if (!r.ok) {
+            errBox.textContent = r.data.error || 'Something went wrong.';
+            errBox.classList.remove('d-none');
+            return;
+          }
+          onSuccess(r.data);
+        })
+        .catch(function () {
+          btn.disabled = false;
+          errBox.textContent = 'Network error. Please try again.';
+          errBox.classList.remove('d-none');
+        });
+    });
+  }
+
+  wireAjaxForm('editProfileForm', 'editProfileError', 'editProfileSubmit', function (data) {
+    var nameEl = document.querySelector('.dh-user-name');
+    var avatarEl = document.querySelector('.dh-avatar');
+    if (nameEl) nameEl.textContent = data.user.username;
+    if (avatarEl) avatarEl.textContent = data.user.username.charAt(0).toUpperCase();
+    closeModal();
+    showToast(data.message, 'success');
+  });
+
+  wireAjaxForm('editPasswordForm', 'editPasswordError', 'editPasswordSubmit', function (data) {
+    document.getElementById('editPasswordForm').reset();
+    closeModal();
+    showToast(data.message, 'success');
+  });
+});
+</script>
+{% endif %}

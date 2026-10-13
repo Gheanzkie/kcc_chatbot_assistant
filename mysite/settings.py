@@ -40,7 +40,6 @@ INSTALLED_APPS = [
 
     'apps.core',
     'apps.users',
-    'apps.info',
 ]
 
 MIDDLEWARE = [
@@ -79,7 +78,7 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'bsitcrud',
+        'NAME': 'kcc_chatbot',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
@@ -129,6 +128,8 @@ STATICFILES_DIRS = [
 
 LOGIN_REDIRECT_URL = '/home/'
 LOGOUT_REDIRECT_URL = '/'
+
+AUTH_USER_MODEL = 'users.User'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

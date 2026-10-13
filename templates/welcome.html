@@ -1,0 +1,340 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>KCC Assistant Chatbot</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --kcc-primary: #0b6e4f;
+      --kcc-primary-dark: #084c37;
+      --kcc-accent: #10b981;
+      --kcc-dark: #0f172a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ---------- NAVBAR ---------- */
+    .kcc-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .kcc-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+    }
+
+    .kcc-brand-logo {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .kcc-brand-text {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.02em;
+    }
+
+    .kcc-brand-text span { color: var(--kcc-accent); }
+
+    .kcc-nav-actions { display: flex; gap: 0.75rem; }
+
+    /* ---------- BUTTONS ---------- */
+    .btn-kcc {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-kcc-outline {
+      background: transparent;
+      color: #cbd5e1;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .btn-kcc-outline:hover {
+      border-color: var(--kcc-accent);
+      color: var(--kcc-accent);
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    .btn-kcc-primary {
+      background: linear-gradient(135deg, var(--kcc-primary), var(--kcc-accent));
+      color: #ffffff;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35);
+    }
+    .btn-kcc-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(16, 185, 129, 0.5);
+    }
+
+    .btn-kcc-lg {
+      padding: 0.9rem 2.2rem;
+      font-size: 1.05rem;
+      border-radius: 10px;
+    }
+
+    /* ---------- HERO ---------- */
+    .kcc-hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 7rem 1.5rem 4rem;
+      position: relative;
+    }
+
+    .kcc-hero::before {
+      content: '';
+      position: absolute;
+      top: 20%; left: 50%;
+      transform: translateX(-50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .kcc-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 1rem;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      color: var(--kcc-accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .kcc-hero-icon {
+      width: 120px; height: 120px;
+      border-radius: 28px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 20px 60px rgba(16, 185, 129, 0.35);
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .kcc-hero-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .kcc-hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.15;
+      color: #f8fafc;
+      margin-bottom: 1rem;
+    }
+
+    .kcc-hero h1 span { color: var(--kcc-accent); }
+
+    .kcc-hero p {
+      font-size: 1.1rem;
+      color: #94a3b8;
+      max-width: 540px;
+      margin: 0 auto 2.25rem;
+      line-height: 1.7;
+    }
+
+    .kcc-hero-actions {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    /* ---------- FEATURES ---------- */
+    .kcc-features {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 1.5rem 5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .kcc-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 1.75rem;
+      transition: all 0.3s ease;
+    }
+    .kcc-card:hover {
+      border-color: rgba(16, 185, 129, 0.35);
+      background: rgba(16, 185, 129, 0.04);
+      transform: translateY(-4px);
+    }
+
+    .kcc-card-icon {
+      width: 48px; height: 48px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--kcc-accent);
+      margin-bottom: 1.1rem;
+    }
+
+    .kcc-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 0.5rem;
+    }
+
+    .kcc-card p {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    /* ---------- FOOTER ---------- */
+    .kcc-footer {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      color: #64748b;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 640px) {
+      .kcc-nav { padding: 0.85rem 1rem; }
+      .kcc-brand-text { font-size: 1rem; }
+      .kcc-hero { padding-top: 6rem; }
+      .kcc-hero-actions { flex-direction: column; width: 100%; max-width: 320px; }
+      .kcc-hero-actions .btn-kcc { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="kcc-nav">
+    <a href="{% url 'welcome' %}" class="kcc-brand">
+      <img src="{% static 'img/kcc_logo.png' %}" alt="KCC Logo" class="kcc-brand-logo">
+      <div class="kcc-brand-text">KCC <span>Chatbot Assistant</span></div>
+    </a>
+    <div class="kcc-nav-actions">
+      <a href="{% url 'login' %}" class="btn-kcc btn-kcc-outline">Sign In</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="kcc-hero">
+    <div class="kcc-hero-badge">
+      <i class="fa-solid fa-bolt"></i> AI-Powered Assistant
+    </div>
+
+    <div class="kcc-hero-icon">
+      <img src="{% static 'img/kcc_logo.png' %}" alt="KCC Logo">
+    </div>
+
+    <h1>Welcome to<br><span>KCC Assistant Chatbot</span></h1>
+
+    <p>
+      Your intelligent knowledge companion. Get instant answers, explore resources,
+      and interact with a smart chatbot built to help you succeed.
+    </p>
+
+    <div class="kcc-hero-actions">
+      <a href="{% url 'login' %}" class="btn-kcc btn-kcc-primary btn-kcc-lg">
+        <i class="fa-solid fa-right-to-bracket"></i> Get Started
+      </a>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="kcc-features">
+    <div class="kcc-card">
+      <div class="kcc-card-icon"><i class="fa-solid fa-brain"></i></div>
+      <h3>Smart Responses</h3>
+      <p>Powered by AI to deliver accurate, context-aware answers to your questions in real time.</p>
+    </div>
+    <div class="kcc-card">
+      <div class="kcc-card-icon"><i class="fa-solid fa-clock"></i></div>
+      <h3>Available 24/7</h3>
+      <p>Access help anytime, anywhere. The assistant never sleeps &mdash; neither do your questions.</p>
+    </div>
+    <div class="kcc-card">
+      <div class="kcc-card-icon"><i class="fa-solid fa-database"></i></div>
+      <h3>Knowledge Base</h3>
+      <p>Backed by a curated repository of resources for reliable and consistent information.</p>
+    </div>
+    <div class="kcc-card">
+      <div class="kcc-card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+      <h3>Secure &amp; Private</h3>
+      <p>Your conversations are protected. Built with security and data privacy in mind.</p>
+    </div>
+    <div class="kcc-card">
+      <div class="kcc-card-icon"><i class="fa-solid fa-bolt"></i></div>
+      <h3>Instant Answers</h3>
+      <p>Get responses in milliseconds. No waiting, no delays &mdash; just results.</p>
+    </div>
+    <div class="kcc-card">
+      <div class="kcc-card-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+      <h3>Built for Learning</h3>
+      <p>Designed to support students and educators with the tools they need to grow.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="kcc-footer">
+    &copy; 2026 KCC Assistant Chatbot. All rights reserved.
+  </footer>
+
+</body>
+</html>

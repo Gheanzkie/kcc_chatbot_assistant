@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from django.contrib import messages
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
@@ -7,48 +5,11 @@ from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.shortcuts import redirect, render
-from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 
 User = get_user_model()
 
-MAX_FAILED_ATTEMPTS = 5
-LOCK_DURATION = timedelta(minutes=1)
-INVALID_LOGIN_MESSAGE = 'Invalid username or password.'
-LOCKED_MESSAGE = 'Too many failed attempts. Locked for 1 minute.'
-
-
-def _reset_lock_state(request):
-    request.session['failed_attempts'] = 0
-    request.session['lock_time'] = None
-
-
-def _get_lock_state(request):
-    failed_attempts = request.session.get('failed_attempts', 0)
-    lock_time = request.session.get('lock_time')
-
-    if not lock_time:
-        return failed_attempts, None
-
-    try:
-        unlock_time = timezone.datetime.fromisoformat(lock_time)
-    except (TypeError, ValueError):
-        _reset_lock_state(request)
-        return 0, None
-
-    if timezone.now() < unlock_time:
-        remaining = int((unlock_time - timezone.now()).total_seconds())
-        return failed_attempts, remaining
-
-    _reset_lock_state(request)
-    return 0, None
-
-
-def _set_lock_state(request):
-    lock_until = timezone.now() + LOCK_DURATION
-    request.session['failed_attempts'] = MAX_FAILED_ATTEMPTS
-    request.session['lock_time'] = lock_until.isoformat()
-    return int(LOCK_DURATION.total_seconds())
+INVALID_LOGIN_MESSAGE = 'Invalid email or password.'
 
 
 def _validate_registration_data(data):
@@ -104,43 +65,44 @@ def login_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
 
-    failed_attempts, remaining = _get_lock_state(request)
-    if remaining is not None:
-        messages.error(request, f'Too many failed attempts. Try again in {remaining} seconds.')
-        return render(request, 'auth/login.html', {'locked': True, 'remaining': remaining})
-
     if request.method == 'GET':
         return render(request, 'auth/login.html')
 
-    username = request.POST.get('username', '').strip()
+    email = request.POST.get('email', '').strip()
     password = request.POST.get('password', '')
-    user = authenticate(request, username=username, password=password)
+    user = authenticate(request, username=email, password=password)
 
     if user is not None:
-        _reset_lock_state(request)
         login(request, user)
         return redirect('dashboard')
 
-    failed_attempts += 1
-    request.session['failed_attempts'] = failed_attempts
-    if failed_attempts >= MAX_FAILED_ATTEMPTS:
-        remaining = _set_lock_state(request)
-        messages.error(request, LOCKED_MESSAGE)
-        return render(request, 'auth/login.html', {'locked': True, 'remaining': remaining})
-
-    remaining_attempts = MAX_FAILED_ATTEMPTS - failed_attempts
-    messages.error(request, f'{INVALID_LOGIN_MESSAGE} {remaining_attempts} attempts remaining.')
+    messages.error(request, INVALID_LOGIN_MESSAGE)
     return render(request, 'auth/login.html')
 
 
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('welcome')
 
 
 @login_required(login_url='login')
 def home(request):
-    return render(request, 'home.html')
+    from apps.users.models import User
+    from django.utils import timezone
+
+    total_users = User.objects.filter(is_superuser=False).count()
+    today = timezone.now().date()
+    active_today = User.objects.filter(
+        last_login__date=today
+    ).count()
+
+    context = {
+        'total_users': total_users,
+        'total_conversations': '—',
+        'total_messages': '—',
+        'active_today': active_today,
+    }
+    return render(request, 'home.html', context)
 
 
 @require_http_methods(['GET', 'POST'])
@@ -173,3 +135,9 @@ def register_view(request):
     )
     login(request, user)
     return redirect('dashboard')
+
+
+def welcome_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    return render(request, 'welcome.html')
